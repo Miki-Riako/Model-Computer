@@ -21,21 +21,21 @@ always @(posedge clk or posedge res) begin
     end
 end
 
-always @(*) begin
+always @(posedge clk or posedge res) begin
     if (load1_enable) begin
         tri1_output = internal_register;
     end else begin
         tri1_output = 8'bzzzzzzzz;
     end
 end
-always @(*) begin
+always @(posedge clk or posedge res) begin
     if (load2_enable) begin
         tri2_output = internal_register;
     end else begin
         tri2_output = 8'bzzzzzzzz;
     end
 end
-always @(*) begin
+always @(posedge clk or posedge res) begin
     constant_output = internal_register;
     monitor_signal = internal_register;
 end
