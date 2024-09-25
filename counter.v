@@ -14,13 +14,13 @@ reg clk_out;
 always @(posedge clk or posedge rst) begin
     if (rst) begin
         count <= 8'b00000000;
-        monitor_signal <= count;
+        monitor_signal <= 8'b00000000;
         div_counter <= 26'd0;
         clk_out <= 1'b0;
     end else begin
         if (mode) begin
             count <= value;
-            monitor_signal <= count;
+            monitor_signal <= value;
         end
         // Divider to 50,000,000 times or less
         if (div_counter == (SPEED ? 26'd2499999 : 26'd24999999)) begin
@@ -35,7 +35,7 @@ end
 always @(posedge clk_out or posedge rst) begin
     if (~mode) begin
         count <= count + STEP;
-        monitor_signal <= count;
+        monitor_signal <= monitor_signal + STEP;
     end
 end
 endmodule

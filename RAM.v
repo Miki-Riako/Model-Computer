@@ -1,6 +1,8 @@
-module RAM (
+module ROM (
     input wire clk,                     // 时钟信号
-    output reg [7:0] current_opcode,    // 当前输出的机器码
+    input wire rst,                     // 复位信号
+    input wire [7:0] address,           // 地址输入
+    output reg [31:0] opcode,           // 当前输出的机器码
 
     input wire [7:0] monitor_inputs0,   // 监视寄存器输入0
     input wire [7:0] monitor_inputs1,   // 监视寄存器输入1
@@ -35,35 +37,59 @@ module RAM (
     output reg [7:0] monitor_outputs14, // 监视输出14
     output reg [7:0] monitor_outputs15  // 监视输出15
 );
-
 reg [7:0] memory [0:255];               // 16*16 = 256个8位机器码
-reg [7:0] address;                      // 存储器地址
 
 initial begin
     // 这里可以预置一些机器码，作为初代版本
-    memory[0]  = 8'b00000001; // 示例机器码
-    memory[1]  = 8'b00000010; // 示例机器码
+    memory[0] = 8'b00000001; // 示例机器码
+    memory[1] = 8'b00000010; // 示例机器码
+    memory[2] = 8'b00000011; // 示例机器码
+    memory[3] = 8'b00000100; // 示例机器码
     // 可以继续填充其他机器码，直到memory[255]
 end
 
 always @(posedge clk) begin
-    current_opcode <= memory[address]; // 输出当前机器码
-    address <= address + 1;            // 计数器递增
-    monitor_outputs0  <= monitor_inputs0;
-    monitor_outputs1  <= monitor_inputs1;
-    monitor_outputs2  <= monitor_inputs2;
-    monitor_outputs3  <= monitor_inputs3;
-    monitor_outputs4  <= monitor_inputs4;
-    monitor_outputs5  <= monitor_inputs5;
-    monitor_outputs6  <= monitor_inputs6;
-    monitor_outputs7  <= monitor_inputs7;
-    monitor_outputs8  <= monitor_inputs8;
-    monitor_outputs9  <= monitor_inputs9;
-    monitor_outputs10 <= monitor_inputs10;
-    monitor_outputs11 <= monitor_inputs11;
-    monitor_outputs12 <= monitor_inputs12;
-    monitor_outputs13 <= monitor_inputs13;
-    monitor_outputs14 <= monitor_inputs14;
-    monitor_outputs15 <= monitor_inputs15;
+    if (rst) begin
+        opcode <= 32'b0;
+    end else begin
+        opcode <= {memory[(address+3)%256], memory[(address+2)%256], memory[(address+1)%256], memory[address]};
+    end
+end
+always @(posedge clk) begin
+    if (rst) begin
+        monitor_outputs0 <= 8'b0;
+        monitor_outputs1 <= 8'b0;
+        monitor_outputs2 <= 8'b0;
+        monitor_outputs3 <= 8'b0;
+        monitor_outputs4 <= 8'b0;
+        monitor_outputs5 <= 8'b0;
+        monitor_outputs6 <= 8'b0;
+        monitor_outputs7 <= 8'b0;
+        monitor_outputs8 <= 8'b0;
+        monitor_outputs9 <= 8'b0;
+        monitor_outputs10 <= 8'b0;
+        monitor_outputs11 <= 8'b0;
+        monitor_outputs12 <= 8'b0;
+        monitor_outputs13 <= 8'b0;
+        monitor_outputs14 <= 8'b0;
+        monitor_outputs15 <= 8'b0;
+    end else begin
+        monitor_outputs0 <= monitor_inputs0;
+        monitor_outputs1 <= monitor_inputs1;
+        monitor_outputs2 <= monitor_inputs2;
+        monitor_outputs3 <= monitor_inputs3;
+        monitor_outputs4 <= monitor_inputs4;
+        monitor_outputs5 <= monitor_inputs5;
+        monitor_outputs6 <= monitor_inputs6;
+        monitor_outputs7 <= monitor_inputs7;
+        monitor_outputs8 <= monitor_inputs8;
+        monitor_outputs9 <= monitor_inputs9;
+        monitor_outputs10 <= monitor_inputs10;
+        monitor_outputs11 <= monitor_inputs11;
+        monitor_outputs12 <= monitor_inputs12;
+        monitor_outputs13 <= monitor_inputs13;
+        monitor_outputs14 <= monitor_inputs14;
+        monitor_outputs15 <= monitor_inputs15;
+    end
 end
 endmodule

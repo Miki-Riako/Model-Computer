@@ -37,6 +37,6 @@ always @(posedge clk or posedge rst) begin
 end
 always @(posedge clk or posedge rst) begin
     constant_output = internal_register;
-    monitor_signal = internal_register;
+    monitor_signal  = internal_register;
 end
 endmodule
