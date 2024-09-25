@@ -5,14 +5,14 @@ module CPU (
     output wire [7:0] o, // O
     output wire [7:0] o_monitor_signal
 );
-    wire [7:0] opcodeBUS;       // 从PROGRAM获取的当前机器码
+    wire [7:0] opcodeBUS;   // 机器码总线
 
     wire [2:0] copy_dest;             // 复制目标寄存器
     wire [2:0] copy_source;           // 被复制的寄存器
     assign copy_dest   = opcodeBUS[2:0]; // 复制目标寄存器
     assign copy_source = opcodeBUS[5:3]; // 被复制的寄存器
     wire immediate, calculation, copy, condition; // 解码信号
-    wire [7:0] BUS; // 总线
+    wire [7:0] dataBUS;    // 数据总线
 
     wire [7:0] a, b;         // ALU输入
     wire judgeVal;           // 条件判断输出
