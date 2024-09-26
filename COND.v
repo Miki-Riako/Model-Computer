@@ -17,7 +17,7 @@ always @(*) begin
             default:  OUTPUT = 1'b0;                               // 默认情况
         endcase
     end else begin
-        OUTPUT = 1'bz;
+        OUTPUT = 1'b0;
     end
 end
 endmodule

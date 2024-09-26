@@ -26,23 +26,35 @@ module controller (
 );
 
 always @(*) begin
-    // 立即数
-    argument1 <= (imm1 ? opcode2 : 8'bzzzzzzzz);
-    argument2 <= (imm2 ? opcode3 : 8'bzzzzzzzz);
-    // 计时器地址
-    argument1 <= (counterEnable1 ? cntOutput : 8'bzzzzzzzz);
-    argument2 <= (counterEnable2 ? cntOutput : 8'bzzzzzzzz);
-    // 输出地址
-    argument1 <= (inputEnable1 ? I : 8'bzzzzzzzz);
-    argument2 <= (inputEnable2 ? I : 8'bzzzzzzzz);
-    // Ram输出
-    argument1 <= (ramEnable1 ? ramOutput : 8'bzzzzzzzz);
-    argument2 <= (ramEnable2 ? ramOutput : 8'bzzzzzzzz);
-    // 栈输出
-    argument1 <= (stackEnable1 ? stackOutput : 8'bzzzzzzzz);
-    argument2 <= (stackEnable2 ? stackOutput : 8'bzzzzzzzz);
-    // 程序计数输出
-    cntInput  <= (counterEnable3 ? address : 8'bzzzzzzzz);
-    cntInput  <= (condition ? (isRet ? stackOutput : opcode4) : 8'bzzzzzzzz);
+    argument1 = 8'bzzzzzzzz;
+    argument2 = 8'bzzzzzzzz;
+    cntInput  = 8'bzzzzzzzz;
+    if (imm1) begin
+        argument1 = opcode2;
+    end else if (counterEnable1) begin
+        argument1 = cntOutput;
+    end else if (inputEnable1) begin
+        argument1 = I;
+    end else if (ramEnable1) begin
+        argument1 = ramOutput;
+    end else if (stackEnable1) begin
+        argument1 = stackOutput;
+    end
+    if (imm2) begin
+        argument2 = opcode3;
+    end else if (counterEnable2) begin
+        argument2 = cntOutput;
+    end else if (inputEnable2) begin
+        argument2 = I;
+    end else if (ramEnable2) begin
+        argument2 = ramOutput;
+    end else if (stackEnable2) begin
+        argument2 = stackOutput;
+    end
+    if (counterEnable3) begin
+        cntInput = address;
+    end else if (condition) begin
+        cntInput = (isRet ? stackOutput : opcode4);
+    end
 end
 endmodule
