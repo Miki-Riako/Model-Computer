@@ -7,14 +7,14 @@ module COND (
 
 always @(*) begin
     if (CONDITION[5]) begin
-        case (CONDITION[2:0])
-            3'b000:  OUTPUT = (INPUT1 == INPUT2); // 等于
-            3'b001:  OUTPUT = (INPUT1 != INPUT2); // 不等于
-            3'b010:  OUTPUT = (INPUT1 <  INPUT2); // 小于
-            3'b011:  OUTPUT = (INPUT1 <= INPUT2); // 小于等于
-            3'b100:  OUTPUT = (INPUT1 >  INPUT2); // 大于
-            3'b101:  OUTPUT = (INPUT1 >= INPUT2); // 大于等于
-            default: OUTPUT = 1'b0;               // 默认情况
+        case (CONDITION[4:0])
+            5'b00000: OUTPUT = (INPUT1 == INPUT2);                 // 等于
+            5'b00001: OUTPUT = (INPUT1 != INPUT2);                 // 不等于
+            5'b00010: OUTPUT = ({1'b0, INPUT1} <  {1'b0, INPUT2}); // （无符号）小于
+            5'b00011: OUTPUT = ({1'b0, INPUT1} <= {1'b0, INPUT2}); // （无符号）小于等于
+            5'b00100: OUTPUT = ({1'b0, INPUT1} >  {1'b0, INPUT2}); // （无符号）大于
+            5'b00101: OUTPUT = ({1'b0, INPUT1} >= {1'b0, INPUT2}); // （无符号）大于等于
+            default:  OUTPUT = 1'b0;                               // 默认情况
         endcase
     end else begin
         OUTPUT = 1'bz;

@@ -7,14 +7,19 @@ module ALU (
 
 always @(*) begin
     if (OPCODE[5] == 0) begin
-        case (OPCODE[2:0])
-            3'b000:  OUTPUT = INPUT1 + INPUT2;  // 加法
-            3'b001:  OUTPUT = INPUT1 - INPUT2;  // 减法
-            3'b010:  OUTPUT = INPUT1 & INPUT2;  // 按位与
-            3'b011:  OUTPUT = INPUT1 | INPUT2;  // 按位或
-            3'b100:  OUTPUT = ~INPUT1;          // 按位非
-            3'b101:  OUTPUT = INPUT1 ^ INPUT2;  // 按位异或
-            default: OUTPUT = 8'b0;             // 默认情况
+        case (OPCODE[3:0])
+            4'b0000: OUTPUT = INPUT1 + INPUT2;                          // 加法
+            4'b0001: OUTPUT = INPUT1 - INPUT2;                          // 减法
+            4'b0010: OUTPUT = INPUT1 & INPUT2;                          // 按位与
+            4'b0011: OUTPUT = INPUT1 | INPUT2;                          // 按位或
+            4'b0100: OUTPUT = ~INPUT1;                                  // 按位非
+            4'b0101: OUTPUT = INPUT1 ^ INPUT2;                          // 按位异或
+            4'b0110: OUTPUT = INPUT1 << INPUT2;                         // 左移
+            4'b0111: OUTPUT = INPUT1 >> INPUT2;                         // 右移
+            4'b1000: OUTPUT = (INPUT1[3:0] * INPUT2[3:0]);              // 半字节乘法
+            4'b1001: OUTPUT = (INPUT2 != 0) ? (INPUT1 / INPUT2) : 8'b0; // 除法商
+            4'b1010: OUTPUT = (INPUT2 != 0) ? (INPUT1 % INPUT2) : 8'b0; // 除法余数
+            default: OUTPUT = 8'b0;                                     // 默认情况
         endcase
     end else begin
         OUTPUT = 8'bz;

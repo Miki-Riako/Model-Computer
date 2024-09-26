@@ -18,6 +18,7 @@ module controller (
     output reg [7:0] writeVal
 );
 
+// TODO
 always @(*) begin
     argument1 <= (imm1 ? opcode2 : 8'bzzzzzzzz);
     argument2 <= (imm2 ? opcode3 : 8'bzzzzzzzz);

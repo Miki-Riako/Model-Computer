@@ -1,8 +1,8 @@
 module DEC (
-    input wire [7:0] OPCODE, // 八位输入机器码
-    output reg IMMEDIATE1,   // 输出：Immediate1
-    output reg IMMEDIATE2,   // 输出：Immediate2
-    output reg CONDITION     // 输出：Condition
+    input wire [7:0] OPCODE, // 机器码
+    output reg IMMEDIATE1,   // Immediate1
+    output reg IMMEDIATE2,   // Immediate2
+    output reg CONDITION     // Condition
 );
 
 always @(*) begin

@@ -6,7 +6,15 @@ module CPU (
     output reg [7:0] O, // O
     output reg IEnable, // I使能信号
     output reg OEnable, // O使能信号
-    output reg [7:0] O_monitor_signal
+
+    output reg [7:0] reg0_monitor_signal,    // 监视输出REG0
+    output reg [7:0] reg1_monitor_signal,    // 监视输出REG1
+    output reg [7:0] reg2_monitor_signal,    // 监视输出REG2
+    output reg [7:0] reg3_monitor_signal,    // 监视输出REG3
+    output reg [7:0] reg4_monitor_signal,    // 监视输出REG4
+    output reg [7:0] reg5_monitor_signal,    // 监视输出REG5
+    output reg [7:0] counter_monitor_signal, // 监视输出COUNTER
+    output reg [7:0] O_monitor_signal        // 监视输出OUTPUT
 );
 /** 机器码, 参数码, 地址码
 OPBUS1: OPBUS[7:0]    -> 机器码操作码
@@ -25,7 +33,7 @@ wire [7:0] dOPBUS2, dOPBUS3, dOPBUS4; // OPBUS2~4解码
 wire [7:0] cnt;                       // 计数指令数
 wire [7:0] writeVal;                  // 待写入计数值
 wire conditionBool;                   // 条件判断信号
-
+// TODO
 always @(posedge rst) begin
     if (rst) begin
         O <= 8'b00000000;

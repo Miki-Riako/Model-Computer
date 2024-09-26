@@ -57,6 +57,7 @@ In this case, ADDRESS will be the jump address.
 | 00001???   | 额外寄存器  |
 | 00010000   | RAM        |
 | 00010001   | REG_RAM    |
+| 00010010   | STACK      |
 
 额外寄存器将储存32位，目前暂未实现，先暂时给出6个八位寄存器。
 
@@ -64,6 +65,8 @@ RAM和REG_RAM的区别
 - RAM的地址与REG_RAM相连。
 - 输出时：RAM输出的是其存储值，REG_RAM输出的是地址。
 - 输入时：RAM输入的是地址，REG_RAM输入的是存储值。
+
+STACK和RAM类似，为栈存储器。
 
 ## OPERATION - COMPUTE
 
@@ -89,23 +92,29 @@ NOT will ignore the second argument.
 
 | 指令                    | 操作码       |
 |-------------------------|-------------|
-| imm8                    | 10000000    |
-| imm7                    | 01000000    |
-| add                     | 00000000    |
-| mov                     | 00000000    |
-| jmp                     | 00000000    |
+| imm1                    | 10000000    |
+| imm2                    | 01000000    |
+| mov                     | 01000000    |
+| jmp                     | 10000000    |
+| push                    | 01000000    |
+| pop                     | 01000000    |
 | to                      | 00000000    |
+| add                     | 00000000    |
 | sub                     | 00000001    |
 | and                     | 00000010    |
 | or                      | 00000011    |
 | not                     | 00000100    |
 | xor                     | 00000101    |
+| null                    | 00000000    |
 | reg0                    | 00000000    |
 | reg1                    | 00000001    |
 | reg2                    | 00000010    |
 | reg3                    | 00000011    |
 | reg4                    | 00000100    |
 | reg5                    | 00000101    |
+| ram                     | 00010000    |
+| reg_ram                 | 00010001    |
+| stack                   | 00010010    |
 | counter                 | 00000110    |
 | input                   | 00000111    |
 | output                  | 00000111    |
@@ -115,32 +124,102 @@ NOT will ignore the second argument.
 | if_less_or__equal       | 00100011    |
 | if_greater              | 00100100    |
 | if_greater_or__equal    | 00100101    |
+| call                    | 00110000    |
+| ret                     | 00110001    |
+| halt                    | 00110010    |
 
 
+| 宽指令                     | 操作码                               |
+|----------------------------|-------------------------------------|
+| mov  ?     to   ?          | 01000000 ???????? 00000000 ???????? |
+| jmp  to    ?    counter    | 10000000 00000000 ???????? 00000110 |
+| push ?     to   stack      | 01000000 ???????? 00000000 00010010 |
+| pop  stack to   ?          | 01000000 00010010 00000000 ???????? |
+| call null  null label      | 00110000 00000000 00000000 ???????? |
+| ret  null  null null       | 00110001 00000000 00000000 00000000 |
+| halt null  null null       | 00110010 00000000 00000000 00000000 |
+
+实际上：
+- 指令mov (01000000) 等价于 push (01000000) 等价于 pop (01000000) 等价于 imm2|add （01000000|00000000），jmp (10000000) 等价于 imm2|add，此处指令作为语法糖方便使用。
+- 指令ret null null null（00110001 00000000 00000000 00000000）可以等价于pop stack to counter（01000000 00010010 00000000 00000110），此处计算机做了集成。
+- 指令call null  null label (00110000 00000000 00000000 ????????) 可以等价于两个宽指令：imm2|add counter 8 stack(01000000 00000110 00001000 00010010)与imm2|jmp to label counter(10000000 00000000 ???????? 00000110)，此处计算机做了集成。
+
+### Example
+``` asm
 if_less reg0 re1 16
+```
 如果reg0 < reg1，跳转到16
-
-imm7|if_equal reg_ram 32 | 0
+``` asm
+imm2|if_equal reg_ram 32 | 0
+```
 如果reg_ram == 32，跳转到0
+
+### 算法示例
 
 ``` asm
 const io_num 32
-imm8|imm7|mov    0           to          reg_ram    # reg_ram置0
+imm1|mov         0           to          reg_ram    # reg_ram置0
 # 循环input:
 label circle_i
-imm7|if_equal    reg_ram     io_num      data_o     # 如果reg_ram=io_num，跳转到data_o
-imm7|mov         input       to          ram        # ram <- input
-imm7|add         reg_ram     1           reg_ram    # reg_ram++
-imm8|imm7|jmp    to          circle_i    counter    # 跳转到circle_i
+imm2|if_equal    reg_ram     io_num      data_o     # 如果reg_ram=io_num，跳转到data_o
+mov              input       to          ram        # ram <- input
+imm2|add         reg_ram     1           reg_ram    # reg_ram++
+imm2|jmp         to          circle_i    counter    # 跳转到circle_i
 # 循环output:
 label data_o
-imm8|imm7|mov    0           to          reg_ram    # reg_ram置0
+imm1|mov         0           to          reg_ram    # reg_ram置0
 label circle_o
-imm7|if_equal    reg_ram     io_num      end        # 如果reg_ram=io_num，跳转到end结束
-imm7|mov         ram         to          output     # output <- ram
-imm7|add         reg_ram     1           reg_ram    # reg_ram++
-imm8|imm7|mov    circle_o    to          counter    # counter <- circle_o
+imm2|if_equal    reg_ram     io_num      end        # 如果reg_ram=io_num，跳转到end结束
+mov              ram         to          output     # output <- ram
+imm2|add         reg_ram     1           reg_ram    # reg_ram++
+imm1|mov         circle_o    to          counter    # counter <- circle_o
 label end
 
 ```
 循环输入32个输入数并储存，然后循环顺序输出。
+
+``` asm
+# 读取输入:
+label read_in
+mov                  input    to        reg3         # reg3 <- input
+imm2|if_equal        reg3     0         pop_data     # 如果reg3=0，跳转到pop_data
+imm2|if_not_equal    reg3     0         push_data    # 否则跳转到push_data
+# 压栈
+label push_data
+push                 reg3     to         stack       # push reg3
+imm2|jmp             to       read_in    counter     # 跳转到read_in
+# 弹栈
+label pop_data
+pop                  stack    to         output      # pop to output
+imm2|jmp             to       read_in    counter     # 跳转到read_in
+
+```
+对输入值进行判断，如果为0则弹栈，否则压栈。
+
+``` asm
+# f = 2(x+y)
+const x 35
+const y 55
+imm1|mov    x       to      reg0       # reg0 <- x
+imm1|mov    y       to      reg1       # reg1 <- y
+call        null    null    funA       # 调用funA
+imm2|jmp    to      end     counter    # 跳转到end
+label funA
+add         reg0    reg1    reg2       # reg2 <- reg0 + reg1
+call        null    null    funB       # 调用funB
+ret         null    null    null       # 返回
+label funB
+add         reg2    reg2    reg2       # reg2 <- reg2 + reg2
+ret         null    null    null       # 返回
+label end
+imm2|add    reg2    0       output     # output <- reg2
+halt        null    null    null       # 停机
+```
+函数使用案例，def f(x, y): return 2*(x+y)
+
+## 我的创新
+
+除了一般的基本任务与扩展任务全部完成以外，还完成了：
+- 计算机修改为32位，理论上能够运行所有32位指令。
+- 增加栈存储器，成为独立于ROM与RAM的第三个存储单元。
+- 修改了寄存器组，增加call与ret指令，使得支持函数调用。

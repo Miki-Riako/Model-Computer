@@ -19,24 +19,9 @@ always @(posedge clk or posedge rst) begin
     end else if (save_enable) begin
         internal_register <= save_byte;
     end
-end
-
-always @(posedge clk or posedge rst) begin
-    if (load1_enable) begin
-        tri1_output = internal_register;
-    end else begin
-        tri1_output = 8'bzzzzzzzz;
-    end
-end
-always @(posedge clk or posedge rst) begin
-    if (load2_enable) begin
-        tri2_output = internal_register;
-    end else begin
-        tri2_output = 8'bzzzzzzzz;
-    end
-end
-always @(posedge clk or posedge rst) begin
-    constant_output = internal_register;
-    monitor_signal  = internal_register;
+    tri1_output     <= load1_enable ? internal_register : 8'bzzzzzzzz;
+    tri2_output     <= load2_enable ? internal_register : 8'bzzzzzzzz;
+    constant_output <= internal_register;
+    monitor_signal  <= internal_register;
 end
 endmodule
