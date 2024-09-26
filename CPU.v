@@ -28,23 +28,31 @@ ADDRBUS               -> 地址码
 wire [31:0] OPBUS;
 wire [15:0] ARGBUS;
 wire [7:0]  ADDRBUS;
-wire imm1, imm2, condition;           // OPBUS1解码
-wire [7:0] dOPBUS2, dOPBUS3, dOPBUS4; // OPBUS2~4解码
-wire [7:0] cnt;                       // 计数指令数
-wire [7:0] writeVal;                  // 待写入计数值
-wire conditionBool;                   // 条件判断信号
+wire imm1, imm2, condition, isCall, isRet, isHalt; // OPBUS1解码
+wire [15:0] dOPBUS2, dOPBUS3, dOPBUS4;             // OPBUS2~4解码
+wire [7:0] cntInput, cntOutput;                  // 计数指令数
+wire [7:0] ramAddr, ramOutput;                     // RAM读写
+wire [7:0] stackInput, stackOutput;                // 栈读写
+// wire [7:0] writeVal;                  // 待写入计数值
+// wire conditionOutput;                   // 条件判断信号
 // TODO
-always @(posedge rst) begin
-    if (rst) begin
-        O <= 8'b00000000;
-        IEnable <= 0;
-        OEnable <= 0;
-    end
-end
-always @(posedge clk or posedge rst) begin
+// always @(posedge rst) begin
+//     if (rst) begin
+//         O <= 8'b00000000;
+//         IEnable <= 0;
+//         OEnable <= 0;
+//     end
+// end
+assign isCall = (OPBUS[7:0] == 8'b0011000);
+assign isRet  = (OPBUS[7:0] == 8'b0011001);
+assign isHalt = (OPBUS[7:0] == 8'b0011010);
+assign stackInput = isCall ? cntOutput + 8'b00000100 : ADDRBUS;
+
+always @(posedge clk) begin
     IEnable <= dOPBUS2[7] | dOPBUS3[7];
     OEnable <= dOPBUS4[7];
-    O <= (dOPBUS4[7] ? ADDRBUS : 8'bzzzzzzzz);
+    O                <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
+    O_monitor_signal <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
 end
 controller control(
     .I(I),
@@ -53,17 +61,21 @@ controller control(
     .opcode4(OPBUS[31:24]),
     .imm1(imm1),
     .imm2(imm2),
-    .cnt(cnt),
+    .condition(condition),
+    .isRet(isRet),
+    .cntOutput(cntOutput),
     .counterEnable1(dOPBUS2[6]),
     .counterEnable2(dOPBUS3[6]),
     .counterEnable3(dOPBUS4[6]),
     .inputEnable1(dOPBUS2[7]),
     .inputEnable2(dOPBUS3[7]),
-    .conditionEnable(condition),
     .address(ADDRBUS),
+    .ramEnable1(dOPBUS2[8]),
+    .ramEnable2(dOPBUS2[8]),
+    .ramOutput(ramOutput),
     .argument1(ARGBUS[7:0]),
     .argument2(ARGBUS[15:8]),
-    .writeVal(writeVal)
+    .cntInput(cntInput)
 );
 DEC dec (
     .OPCODE(OPBUS[7:0]),
@@ -75,7 +87,7 @@ COND cond (
     .CONDITION(OPBUS[7:0]),
     .INPUT1(ARGBUS[7:0]),
     .INPUT2(ARGBUS[15:8]),
-    .OUTPUT(conditionBool)
+    .OUTPUT(conditionOutput)
 );
 ALU alu (
     .OPCODE(OPBUS[7:0]),
@@ -86,90 +98,137 @@ ALU alu (
 registerPlus reg0 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[0] & ~imm1),
-    .load2_enable(dOPBUS3[0] & ~imm2),
+    .load1_enable(dOPBUS2[0]),
+    .load2_enable(dOPBUS3[0]),
     .save_enable(dOPBUS4[0]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg0_monitor_signal)
 );
 registerPlus reg1 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[1] & ~imm1),
-    .load2_enable(dOPBUS3[1] & ~imm2),
+    .load1_enable(dOPBUS2[1]),
+    .load2_enable(dOPBUS3[1]),
     .save_enable(dOPBUS4[1]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg1_monitor_signal)
 );
 registerPlus reg2 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[2] & ~imm1),
-    .load2_enable(dOPBUS3[2] & ~imm2),
+    .load1_enable(dOPBUS2[2]),
+    .load2_enable(dOPBUS3[2]),
     .save_enable(dOPBUS4[2]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg2_monitor_signal)
 );
 registerPlus reg3 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[3] & ~imm1),
-    .load2_enable(dOPBUS3[3] & ~imm2),
+    .load1_enable(dOPBUS2[3]),
+    .load2_enable(dOPBUS3[3]),
     .save_enable(dOPBUS4[3]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg3_monitor_signal)
 );
 registerPlus reg4 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[4] & ~imm1),
-    .load2_enable(dOPBUS3[4] & ~imm2),
+    .load1_enable(dOPBUS2[4]),
+    .load2_enable(dOPBUS3[4]),
     .save_enable(dOPBUS4[4]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg4_monitor_signal)
 );
 registerPlus reg5 (
     .clk(clk),
     .rst(rst),
-    .load1_enable(dOPBUS2[5] & ~imm1),
-    .load2_enable(dOPBUS3[5] & ~imm2),
+    .load1_enable(dOPBUS2[5]),
+    .load2_enable(dOPBUS3[5]),
     .save_enable(dOPBUS4[5]),
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .monitor_signal()
+    .monitor_signal(reg5_monitor_signal)
+);
+STACK stack(
+    .clk(clk),
+    .rst(rst),
+    .POP(dOPBUS2[10] | dOPBUS3[10] | isRet),
+    .PUSH(dOPBUS4[10] | isCall),
+    .VALUE(stackInput),
+    .OUTPUT(stackOutput)
+);
+registerPlus reg_ram (
+    .clk(clk),
+    .rst(rst),
+    .load1_enable(dOPBUS2[9]),
+    .load2_enable(dOPBUS3[9]),
+    .save_enable(dOPBUS4[9]),
+    .save_byte(ADDRBUS),
+    .tri1_output(ARGBUS[7:0]),
+    .tri2_output(ARGBUS[15:8]),
+    .constant_output(ramAddr)
+);
+RAM ram(
+    .clk(clk),
+    .rst(rst),
+    .read(dOPBUS2[8] | dOPBUS3[8]),
+    .write(dOPBUS4[8]),
+    .address(ramAddr),
+    .data(ADDRBUS),
+    .out(ramOutput)
 );
 counter count (
     .STEP(8'b00000100),
     .SPEED(SPEED),
+    .ENABLE(isHalt),
     .clk(clk),
     .rst(rst),
-    .mode(conditionBool | dOPBUS4[6]),
-    .value(O),
-    .count(cnt),
-    .monitor_signal()
-    );
-decoder d2(
+    .mode(conditionOutput | isCall | isRet | dOPBUS4[6]),
+    .value(cntInput),
+    .count(cntOutput),
+    .monitor_signal(counter_monitor_signal)
+    ); // TODO: COUNTER may need to be revised
+decoder d2_1(
+    .enable(imm1 | OPBUS[12]),
     .A(OPBUS[15:8]),
-    .Y(dOPBUS2)
+    .Y(dOPBUS2[7:0])
 );
-decoder d3(
+decoder d2_2(
+    .enable(imm1 | ~OPBUS[12]),
+    .A(OPBUS[15:8]),
+    .Y(dOPBUS2[15:8])
+);
+decoder d3_1(
+    .enable(imm2 | OPBUS[20]),
     .A(OPBUS[23:16]),
-    .Y(dOPBUS3)
+    .Y(dOPBUS3[7:0])
 );
-decoder d4(
+decoder d3_2(
+    .enable(imm2 | ~OPBUS[20]),
+    .A(OPBUS[23:16]),
+    .Y(dOPBUS3[15:8])
+);
+decoder d4_1(
+    .enable(condition | OPBUS[28]),
     .A(OPBUS[31:24]),
-    .Y(dOPBUS4)
+    .Y(dOPBUS4[7:0])
+);
+decoder d4_2(
+    .enable(condition | ~OPBUS[28]),
+    .A(OPBUS[31:24]),
+    .Y(dOPBUS4[15:8])
 );
 // RAM program (
 // ...

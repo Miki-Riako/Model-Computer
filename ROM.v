@@ -120,6 +120,6 @@ always @(posedge rst) begin
 end
 
 always @(posedge clk) begin
-    opcode <= {memory[(address+3)%256], memory[(address+2)%256], memory[(address+1)%256], memory[address]};
+    opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
 end
 endmodule

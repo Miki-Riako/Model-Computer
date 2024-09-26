@@ -1,6 +1,7 @@
 module counter (
     input wire [7:0] STEP,
     input wire SPEED,
+    input wire ENABLE,
     input wire clk,
     input wire rst,
     input wire mode,
@@ -33,9 +34,11 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk_out) begin
-    if (~mode) begin
-        count <= count + STEP;
-        monitor_signal <= monitor_signal + STEP;
+    if (ENABLE) begin
+        if (~mode) begin
+            count <= count + STEP;
+            monitor_signal <= monitor_signal + STEP;
+        end
     end
 end
 endmodule
