@@ -14,14 +14,14 @@ module CPU (
     output reg IEnable,      // I使能信号
     output reg OEnable,      // O使能信号
 
-    output reg [7:0] reg0_monitor_signal,    // 监视输出REG0
-    output reg [7:0] reg1_monitor_signal,    // 监视输出REG1
-    output reg [7:0] reg2_monitor_signal,    // 监视输出REG2
-    output reg [7:0] reg3_monitor_signal,    // 监视输出REG3
-    output reg [7:0] reg4_monitor_signal,    // 监视输出REG4
-    output reg [7:0] reg5_monitor_signal,    // 监视输出REG5
-    output reg [7:0] counter_monitor_signal, // 监视输出COUNTER
-    output reg [7:0] O_monitor_signal        // 监视输出OUTPUT
+    output wire [7:0] reg0_monitor_signal,    // 监视输出REG0
+    output wire [7:0] reg1_monitor_signal,    // 监视输出REG1
+    output wire [7:0] reg2_monitor_signal,    // 监视输出REG2
+    output wire [7:0] reg3_monitor_signal,    // 监视输出REG3
+    output wire [7:0] reg4_monitor_signal,    // 监视输出REG4
+    output wire [7:0] reg5_monitor_signal,    // 监视输出REG5
+    output wire [7:0] counter_monitor_signal, // 监视输出COUNTER
+    output reg  [7:0] O_monitor_signal        // 监视输出OUTPUT
 );
 /** 机器码, 参数码, 地址码
 OPBUS1: OPBUS[7:0]    -> 机器码操作码
@@ -47,18 +47,17 @@ assign isRet  = (OPBUS[7:0] == 8'b0011001);
 assign isHalt = (OPBUS[7:0] == 8'b0011010);
 assign stackInput = isCall ? cntOutput + 8'b00000100 : ADDRBUS;
 
-always @(posedge rst) begin
+always @(posedge clk or posedge rst) begin
     if (rst) begin
         O <= 8'b00000000;
         IEnable <= 0;
         OEnable <= 0;
+    end else begin
+        IEnable <= dOPBUS2[7] | dOPBUS3[7];
+        OEnable <= dOPBUS4[7];
+        O                <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
+        O_monitor_signal <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
     end
-end
-always @(posedge clk) begin
-    IEnable <= dOPBUS2[7] | dOPBUS3[7];
-    OEnable <= dOPBUS4[7];
-    O                <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
-    O_monitor_signal <= (dOPBUS4[7] ? ADDRBUS : 8'b00000000);
 end
 controller control(
     .I(I),
@@ -79,6 +78,9 @@ controller control(
     .ramEnable1(dOPBUS2[8]),
     .ramEnable2(dOPBUS2[8]),
     .ramOutput(ramOutput),
+    .stackEnable1(dOPBUS2[10]),
+    .stackEnable2(dOPBUS3[10]),
+    .stackOutput(stackOutput),
     .argument1(ARGBUS[7:0]),
     .argument2(ARGBUS[15:8]),
     .cntInput(cntInput)
@@ -207,7 +209,6 @@ ROM rom (
 );
 counter count (
     .STEP(8'b00000100),
-    .SPEED(SPEED),
     .ENABLE(isHalt),
     .clk(clk),
     .rst(rst),

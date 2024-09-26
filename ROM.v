@@ -72,60 +72,60 @@ IMM1|MOV         CIRCLE_O    TO          COUNTER    # COUNTER <- CIRCLE_O
 LABEL END
 **/
 localparam IO_NUM = 8'b00100000; // 每次读32个
-always @(posedge rst) begin // 这是ROM (BIOS)
-    memory[0]  = IMM1 | MOV;               // 0: IMM1 | MOV
-    memory[1]  = 8'b00000000;              // 1: 0
-    memory[2]  = TO;                       // 2: TO
-    memory[3]  = REG_RAM;                  // 3: REG_RAM
-    // 循环INPUT
-    memory[4]  = IMM2 | IF_EQUAL;          // 4: IMM2 | IF_EQUAL
-    memory[5]  = REG_RAM;                  // 5: REG_RAM
-    memory[6]  = IO_NUM;                   // 6: IO_NUM
-    memory[7]  = 8'b00010100;              // 7: DATA_O: 20
-    memory[8]  = MOV;                      // 8: MOV
-    memory[9]  = INPUT;                    // 9: INPUT
-    memory[10] = TO;                       // 10: TO
-    memory[11] = RAM;                      // 11: RAM
-    memory[12] = IMM2 | ADD;               // 12: IMM2 | ADD
-    memory[13] = REG_RAM;                  // 13: REG_RAM
-    memory[14] = 8'b00000001;              // 14: 1
-    memory[15] = REG_RAM;                  // 15: REG_RAM
-    memory[16] = IMM2 | JMP;               // 16: IMM2 | JMP
-    memory[17] = TO;                       // 17: TO
-    memory[18] = 8'b00000100;              // 18: CIRCLE_I: 4
-    memory[19] = COUNTER;                  // 19: COUNTER
-    // 循环OUTPUT
-    memory[20] = IMM1 | MOV;               // 20: IMM1 | MOV
-    memory[21] = 8'b00000000;              // 21: 0
-    memory[22] = TO;                       // 22: TO
-    memory[23] = REG_RAM;                  // 23: REG_RAM
-    memory[24] = IMM2 | IF_EQUAL;          // 24: IMM2 | IF_EQUAL
-    memory[25] = REG_RAM;                  // 25: REG_RAM
-    memory[26] = IO_NUM;                   // 26: IO_NUM
-    memory[27] = 8'b00101000;              // 27: END: 40
-    memory[28] = MOV;                      // 28: MOV
-    memory[29] = RAM;                      // 29: RAM
-    memory[30] = TO;                       // 30: TO
-    memory[31] = OUTPUT;                   // 31: OUTPUT
-    memory[32] = IMM2 | ADD;               // 32: IMM2 | ADD
-    memory[33] = REG_RAM;                  // 33: REG_RAM
-    memory[34] = 8'b00000001;              // 34: 1
-    memory[35] = REG_RAM;                  // 35: REG_RAM
-    memory[36] = IMM1 | MOV;               // 36: IMM1 | MOV
-    memory[37] = 8'b00000100;              // 37: CIRCLE_O: 4
-    memory[38] = TO;                       // 38: TO
-    memory[39] = COUNTER;                  // 39: COUNTER
-    memory[40] = HALT;                     // 40: HALT
-    
-    opcode <= 32'b0;
-end
-always @(posedge clk) begin
-    opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
-end
-always @(posedge send) begin
-    memory[4*line]   = code[7:0];
-    memory[4*line+1] = code[15:8];
-    memory[4*line+2] = code[23:16];
-    memory[4*line+3] = code[31:24];
+always @(posedge clk or posedge rst) begin
+    if (rst) begin // 这是ROM (BIOS)
+        memory[0]  <= IMM1 | MOV;               // 0: IMM1 | MOV
+        memory[1]  <= 8'b00000000;              // 1: 0
+        memory[2]  <= TO;                       // 2: TO
+        memory[3]  <= REG_RAM;                  // 3: REG_RAM
+        // 循环INPUT
+        memory[4]  <= IMM2 | IF_EQUAL;          // 4: IMM2 | IF_EQUAL
+        memory[5]  <= REG_RAM;                  // 5: REG_RAM
+        memory[6]  <= IO_NUM;                   // 6: IO_NUM
+        memory[7]  <= 8'b00010100;              // 7: DATA_O: 20
+        memory[8]  <= MOV;                      // 8: MOV
+        memory[9]  <= INPUT;                    // 9: INPUT
+        memory[10] <= TO;                       // 10: TO
+        memory[11] <= RAM;                      // 11: RAM
+        memory[12] <= IMM2 | ADD;               // 12: IMM2 | ADD
+        memory[13] <= REG_RAM;                  // 13: REG_RAM
+        memory[14] <= 8'b00000001;              // 14: 1
+        memory[15] <= REG_RAM;                  // 15: REG_RAM
+        memory[16] <= IMM2 | JMP;               // 16: IMM2 | JMP
+        memory[17] <= TO;                       // 17: TO
+        memory[18] <= 8'b00000100;              // 18: CIRCLE_I: 4
+        memory[19] <= COUNTER;                  // 19: COUNTER
+        // 循环OUTPUT
+        memory[20] <= IMM1 | MOV;               // 20: IMM1 | MOV
+        memory[21] <= 8'b00000000;              // 21: 0
+        memory[22] <= TO;                       // 22: TO
+        memory[23] <= REG_RAM;                  // 23: REG_RAM
+        memory[24] <= IMM2 | IF_EQUAL;          // 24: IMM2 | IF_EQUAL
+        memory[25] <= REG_RAM;                  // 25: REG_RAM
+        memory[26] <= IO_NUM;                   // 26: IO_NUM
+        memory[27] <= 8'b00101000;              // 27: END: 40
+        memory[28] <= MOV;                      // 28: MOV
+        memory[29] <= RAM;                      // 29: RAM
+        memory[30] <= TO;                       // 30: TO
+        memory[31] <= OUTPUT;                   // 31: OUTPUT
+        memory[32] <= IMM2 | ADD;               // 32: IMM2 | ADD
+        memory[33] <= REG_RAM;                  // 33: REG_RAM
+        memory[34] <= 8'b00000001;              // 34: 1
+        memory[35] <= REG_RAM;                  // 35: REG_RAM
+        memory[36] <= IMM1 | MOV;               // 36: IMM1 | MOV
+        memory[37] <= 8'b00000100;              // 37: CIRCLE_O: 4
+        memory[38] <= TO;                       // 38: TO
+        memory[39] <= COUNTER;                  // 39: COUNTER
+        memory[40] <= HALT;                     // 40: HALT
+        
+        opcode <= 32'b0;
+    end else if (send)  begin
+        memory[4*line]   <= code[7:0];
+        memory[4*line+1] <= code[15:8];
+        memory[4*line+2] <= code[23:16];
+        memory[4*line+3] <= code[31:24];
+    end else begin
+        opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
+    end
 end
 endmodule
