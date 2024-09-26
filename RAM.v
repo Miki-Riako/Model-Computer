@@ -1,4 +1,4 @@
-module ROM (
+module RAM (
     input wire clk,                     // 时钟信号
     input wire rst,                     // 复位信号
     input wire [7:0] address,           // 地址输入
