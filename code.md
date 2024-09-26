@@ -78,6 +78,11 @@ STACK和RAM类似，为栈存储器。
 | ??000011   | OR     |
 | ??000100   | NOT    |
 | ??000101   | XOR    |
+| ??000110   | SHL    |
+| ??000111   | SHR    |
+| ??001000   | MUL    |
+| ??001001   | DIV    |
+| ??001010   | MOD    |
 
 NOT will ignore the second argument.
 
@@ -105,6 +110,11 @@ NOT will ignore the second argument.
 | or                      | 00000011    |
 | not                     | 00000100    |
 | xor                     | 00000101    |
+| shl                     | 00000110    |
+| shr                     | 00000111    |
+| mul                     | 00001000    |
+| div                     | 00001001    |
+| mod                     | 00001010    |
 | null                    | 00000000    |
 | reg0                    | 00000000    |
 | reg1                    | 00000001    |
