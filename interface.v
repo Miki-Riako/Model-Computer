@@ -24,6 +24,8 @@ module interface (
     output wire video_de           // 数据有效信号
 );
 
+wire [7:0] o0, o1, o2, o3, o4, o5, o6, o7;
+
 COMPUTER (
     .clk(clk),
     .rstROM(rstROM),
@@ -35,19 +37,18 @@ COMPUTER (
     .unit(unit),
     .code(code),
     .send(send),
-    .chose(chose),
     .I(I),
     .O(O),
     .IEnable(IEnable),
     .OEnable(OEnable),
-    .monitor_outputs0(),
-    .monitor_outputs1(),
-    .monitor_outputs2(),
-    .monitor_outputs3(),
-    .monitor_outputs4(),
-    .monitor_outputs5(),
-    .monitor_outputs6(),
-    .monitor_outputs7(),
+    .monitor_outputs0(o0),
+    .monitor_outputs1(o1),
+    .monitor_outputs2(o2),
+    .monitor_outputs3(o3),
+    .monitor_outputs4(o4),
+    .monitor_outputs5(o5),
+    .monitor_outputs6(o6),
+    .monitor_outputs7(o7),
     .monitor_outputs8(),
     .monitor_outputs9(),
     .monitor_outputs10(),
@@ -62,14 +63,14 @@ lcd_top display (
     .clk_50M(clk),         // 50MHz时钟输入
     .reset_btn(rst),       // 重置按钮
     .O(O),
-    .monitor_outputs0(monitor_outputs0),
-    .monitor_outputs1(monitor_outputs1),
-    .monitor_outputs2(monitor_outputs2),
-    .monitor_outputs3(monitor_outputs3),
-    .monitor_outputs4(monitor_outputs4),
-    .monitor_outputs5(monitor_outputs5),
-    .monitor_outputs6(monitor_outputs6),
-    .monitor_outputs7(monitor_outputs7),
+    .monitor_outputs0(o0),
+    .monitor_outputs1(o1),
+    .monitor_outputs2(o2),
+    .monitor_outputs3(o3),
+    .monitor_outputs4(o4),
+    .monitor_outputs5(o5),
+    .monitor_outputs6(o6),
+    .monitor_outputs7(o7),
     .video_red(video_red),     // 视频信号红色分量
     .video_green(video_green), // 视频信号绿色分量
     .video_blue(video_blue),   // 视频信号蓝色分量

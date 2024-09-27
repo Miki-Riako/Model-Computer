@@ -267,14 +267,12 @@ always @(posedge clk or posedge rst) begin
         memory[253] <= 8'b00000000;
         memory[254] <= 8'b00000000;
         memory[255] <= 8'b00000000;
-        out <= 8'b00000000;
+        out <= 8'bzzzzzzzz;
     end else begin
         if (write) begin
             memory[address] <= data;
         end
-        if (read) begin
-            out <= memory[address];
-        end
+        out <= read ? memory[address] : 8'bzzzzzzzz;
     end
 end
 endmodule

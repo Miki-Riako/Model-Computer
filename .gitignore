@@ -1,6 +1,5 @@
 .vscode
 *.unused.v
-*.tb.v
 *.out
 *.vcd
 *.txt
