@@ -52,9 +52,9 @@ module lcd_top (
     wire [79:0] line_0;
     wire [79:0] line_1;
     wire [79:0] line_2;
-    assign line_0 = {o0h, o0l, o1h, o1l, SPACE, SPACE, o2h, o2l, o3h, o3l};
+    assign line_0 = {o0h, o0l, o1h, o1l, Oh, Ol, o2h, o2l, o3h, o3l};
     assign line_1 = {o4h, o4l, o5h, o5l, SPACE, SPACE, o6h, o6l, o7h, o7l};
-    assign line_2 = {SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, Oh, Ol};
+    assign line_2 = {SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE, SPACE};
 
     // DVI输出模块实例化
     dvi_module dvi_inst (
@@ -79,14 +79,14 @@ module bin2ascii(
     output reg [7:0] ascii_low
 );
 always @(*) begin
-    if (bin[7:4] < 4'd10)
+    // if (bin[7:4] < 4'd10)
         ascii_high = bin[7:4] + 8'h30;
-    else
-        ascii_high = bin[7:4] + 8'h37;
-    if (bin[3:0] < 4'd10)
+    // else
+        // ascii_high = bin[7:4] + 8'h37;
+    // if (bin[3:0] < 4'd10)
         ascii_low = bin[3:0] + 8'h30;
-    else
-        ascii_low = bin[3:0] + 8'h37;
+    // else
+        // ascii_low = bin[3:0] + 8'h37;
 end
 endmodule
 
@@ -120,7 +120,7 @@ module dvi_module (
     output wire           video_de,    // 数据有效信号
     input wire [79:0]     line_0_ascii,// 第一行ASCII字符数据
     input wire [79:0]     line_1_ascii,// 第二行ASCII字符数据
-    input wire [7:0]      line_2_number // 第三行显示的数字数据
+    input wire [79:0]      line_2_number // 第三行显示的数字数据
 );
 
 wire [15:0] line_2_ascii;
@@ -159,7 +159,7 @@ wire [6:0] column_location; // 当前列的位置
 assign column_location = column_from_left << 3;
 assign ascii = (line_from_top == 0) ? line_0_ascii[79 - column_location -: 8] :
             (line_from_top == 1) ? line_1_ascii[79 - column_location -: 8] :
-            (line_from_top == 2) ? line_2_ascii[15 - column_location -: 8] :
+            (line_from_top == 2) ? line_2_ascii[79 - column_location -: 8] :
             8'b0;
 
 wire [7:0] ascii_rom_line; // ASCII ROM输出

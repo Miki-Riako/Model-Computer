@@ -3,6 +3,7 @@ module ROM (
     input wire [7:0] unit,    // 代码位置
     input wire [7:0] code,    // 代码
     input wire send,          // 发送程序信号
+    input wire [1:0] program, // 示例程序
     input wire clk,           // 时钟信号
     input wire rst,           // 复位信号
     input wire [7:0] address, // 地址输入
@@ -52,82 +53,228 @@ localparam HALT = 8'b00110010;
 
 reg [7:0] memory [0:255];     // 16*16 = 256个8位机器码
 
-/**
-CONST IO_NUM 32
-IMM1|MOV         0           TO          REG_RAM    # REG_RAM置0
-# 循环INPUT:
-LABEL CIRCLE_I
-IMM2|IF_EQUAL    REG_RAM     IO_NUM      DATA_O     # 如果REG_RAM=IO_NUM，跳转到DATA_O
-MOV              INPUT       TO          RAM        # RAM <- INPUT
-IMM2|ADD         REG_RAM     1           REG_RAM    # REG_RAM++
-IMM2|JMP         TO          CIRCLE_I    COUNTER    # 跳转到CIRCLE_I
-# 循环OUTPUT:
-LABEL DATA_O
-IMM1|MOV         0           TO          REG_RAM    # REG_RAM置0
-LABEL CIRCLE_O
-IMM2|IF_EQUAL    REG_RAM     IO_NUM      END        # 如果REG_RAM=IO_NUM，跳转到END结束
-MOV              RAM         TO          OUTPUT     # OUTPUT <- RAM
-IMM2|ADD         REG_RAM     1           REG_RAM    # REG_RAM++
-IMM1|MOV         CIRCLE_O    TO          COUNTER    # COUNTER <- CIRCLE_O
-LABEL END
-**/
-localparam IO_NUM = 8'b00100000; // 每次读32个
+localparam IO_NUM = 8'b00100000;
+localparam X = 8'b00100011;
+localparam Y = 8'b00110111;
+
 always @(posedge clk or posedge rst) begin
     if (rst) begin // 这是ROM (BIOS)
-        memory[0]  <= (IMM1 | MOV);               // 0: IMM1 | MOV
-        memory[1]  <= 8'b00000000;              // 1: 0
-        memory[2]  <= TO;                       // 2: TO
-        memory[3]  <= REG_RAM;                  // 3: REG_RAM
-        // 循环INPUT
-        memory[4]  <= IMM2 | IF_EQUAL;          // 4: IMM2 | IF_EQUAL
-        memory[5]  <= REG_RAM;                  // 5: REG_RAM
-        memory[6]  <= IO_NUM;                   // 6: IO_NUM
-        memory[7]  <= 8'b00010100;              // 7: DATA_O: 20
-        memory[8]  <= MOV;                      // 8: MOV
-        memory[9]  <= INPUT;                    // 9: INPUT
-        memory[10] <= TO;                       // 10: TO
-        memory[11] <= RAM;                      // 11: RAM
-        memory[12] <= IMM2 | ADD;               // 12: IMM2 | ADD
-        memory[13] <= REG_RAM;                  // 13: REG_RAM
-        memory[14] <= 8'b00000001;              // 14: 1
-        memory[15] <= REG_RAM;                  // 15: REG_RAM
-        memory[16] <= IMM2 | JMP;               // 16: IMM2 | JMP
-        memory[17] <= TO;                       // 17: TO
-        memory[18] <= 8'b00000100;              // 18: CIRCLE_I: 4
-        memory[19] <= COUNTER;                  // 19: COUNTER
-        // 循环OUTPUT
-        memory[20] <= IMM1 | MOV;               // 20: IMM1 | MOV
-        memory[21] <= 8'b00000000;              // 21: 0
-        memory[22] <= TO;                       // 22: TO
-        memory[23] <= REG_RAM;                  // 23: REG_RAM
-        memory[24] <= IMM2 | IF_EQUAL;          // 24: IMM2 | IF_EQUAL
-        memory[25] <= REG_RAM;                  // 25: REG_RAM
-        memory[26] <= IO_NUM;                   // 26: IO_NUM
-        memory[27] <= 8'b00101000;              // 27: END: 40
-        memory[28] <= MOV;                      // 28: MOV
-        memory[29] <= RAM;                      // 29: RAM
-        memory[30] <= TO;                       // 30: TO
-        memory[31] <= OUTPUT;                   // 31: OUTPUT
-        memory[32] <= IMM2 | ADD;               // 32: IMM2 | ADD
-        memory[33] <= REG_RAM;                  // 33: REG_RAM
-        memory[34] <= 8'b00000001;              // 34: 1
-        memory[35] <= REG_RAM;                  // 35: REG_RAM
-        memory[36] <= IMM1 | MOV;               // 36: IMM1 | MOV
-        memory[37] <= 8'b00000100;              // 37: CIRCLE_O: 4
-        memory[38] <= TO;                       // 38: TO
-        memory[39] <= COUNTER;                  // 39: COUNTER
-        memory[40] <= HALT;                     // 40: HALT
-        memory[41] <= 8'b00000000;
-        memory[42] <= 8'b00000000;
-        memory[43] <= 8'b00000000;
-        memory[44] <= 8'b00000000;
-        memory[45] <= 8'b00000000;
-        memory[46] <= 8'b00000000;
-        memory[47] <= 8'b00000000;
-        memory[48] <= 8'b00000000;
-        memory[49] <= 8'b00000000;
-        memory[50] <= 8'b00000000;
-        memory[51] <= 8'b00000000;
+        case (program[1:0])
+        2'b00: begin
+            memory[0] <= 8'b00000000;
+            memory[1] <= 8'b00000000;
+            memory[2] <= 8'b00000000;
+            memory[3] <= 8'b00000000;
+            memory[4] <= 8'b00000000;
+            memory[5] <= 8'b00000000;
+            memory[6] <= 8'b00000000;
+            memory[7] <= 8'b00000000;
+            memory[8] <= 8'b00000000;
+            memory[9] <= 8'b00000000;
+            memory[10] <= 8'b00000000;
+            memory[11] <= 8'b00000000;
+            memory[12] <= 8'b00000000;
+            memory[13] <= 8'b00000000;
+            memory[14] <= 8'b00000000;
+            memory[15] <= 8'b00000000;
+            memory[16] <= 8'b00000000;
+            memory[17] <= 8'b00000000;
+            memory[18] <= 8'b00000000;
+            memory[19] <= 8'b00000000;
+            memory[20] <= 8'b00000000;
+            memory[21] <= 8'b00000000;
+            memory[22] <= 8'b00000000;
+            memory[23] <= 8'b00000000;
+            memory[24] <= 8'b00000000;
+            memory[25] <= 8'b00000000;
+            memory[26] <= 8'b00000000;
+            memory[27] <= 8'b00000000;
+            memory[28] <= 8'b00000000;
+            memory[29] <= 8'b00000000;
+            memory[30] <= 8'b00000000;
+            memory[31] <= 8'b00000000;
+            memory[32] <= 8'b00000000;
+            memory[33] <= 8'b00000000;
+            memory[34] <= 8'b00000000;
+            memory[35] <= 8'b00000000;
+            memory[36] <= 8'b00000000;
+            memory[37] <= 8'b00000000;
+            memory[38] <= 8'b00000000;
+            memory[39] <= 8'b00000000;
+            memory[40] <= 8'b00000000;
+            memory[41] <= 8'b00000000;
+            memory[42] <= 8'b00000000;
+            memory[43] <= 8'b00000000;
+            memory[44] <= 8'b00000000;
+            memory[45] <= 8'b00000000;
+            memory[46] <= 8'b00000000;
+            memory[47] <= 8'b00000000;
+            memory[48] <= 8'b00000000;
+            memory[49] <= 8'b00000000;
+            memory[50] <= 8'b00000000;
+            memory[51] <= 8'b00000000;
+        end 2'b01: begin
+            memory[0]  <= (IMM1 | MOV);
+            memory[1]  <= 8'b00000000;
+            memory[2]  <= TO;
+            memory[3]  <= REG_RAM;
+            memory[4]  <= IMM2 | IF_EQUAL;
+            memory[5]  <= REG_RAM;
+            memory[6]  <= IO_NUM;
+            memory[7]  <= 8'b00010100;
+            memory[8]  <= MOV;
+            memory[9]  <= INPUT;
+            memory[10] <= TO;
+            memory[11] <= RAM;
+            memory[12] <= IMM2 | ADD;
+            memory[13] <= REG_RAM;
+            memory[14] <= 8'b00000001;
+            memory[15] <= REG_RAM;
+            memory[16] <= IMM2 | JMP;
+            memory[17] <= TO;
+            memory[18] <= 8'b00000100;
+            memory[19] <= COUNTER;
+            memory[20] <= IMM1 | MOV;
+            memory[21] <= 8'b00000000;
+            memory[22] <= TO;
+            memory[23] <= REG_RAM;
+            memory[24] <= IMM2 | IF_EQUAL;
+            memory[25] <= REG_RAM;
+            memory[26] <= IO_NUM;
+            memory[27] <= 8'b00101000;
+            memory[28] <= MOV;
+            memory[29] <= RAM;
+            memory[30] <= TO;
+            memory[31] <= OUTPUT;
+            memory[32] <= IMM2 | ADD;
+            memory[33] <= REG_RAM;
+            memory[34] <= 8'b00000001;
+            memory[35] <= REG_RAM;
+            memory[36] <= IMM1 | MOV;
+            memory[37] <= 8'b00000100;
+            memory[38] <= TO;
+            memory[39] <= COUNTER;
+            memory[40] <= HALT;
+            memory[41] <= NULL;
+            memory[42] <= NULL;
+            memory[43] <= NULL;
+            memory[44] <= 8'b00000000;
+            memory[45] <= 8'b00000000;
+            memory[46] <= 8'b00000000;
+            memory[47] <= 8'b00000000;
+            memory[48] <= 8'b00000000;
+            memory[49] <= 8'b00000000;
+            memory[50] <= 8'b00000000;
+            memory[51] <= 8'b00000000;
+        end 2'b10: begin
+            memory[0]  <= MOV;
+            memory[1]  <= INPUT;
+            memory[2]  <= TO;
+            memory[3]  <= REG3;
+            memory[4]  <= IMM2 | IF_EQUAL;
+            memory[5]  <= REG3;
+            memory[6]  <= 8'b00000000;
+            memory[7]  <= 8'b0010100;
+            memory[8]  <= IMM2 | IF_NOT_EQUAL;
+            memory[9]  <= REG3;
+            memory[10] <= 8'b00000000;
+            memory[11] <= 8'b00001100;
+            memory[12] <= PUSH;
+            memory[13] <= REG3;
+            memory[14] <= TO;
+            memory[15] <= STACK;
+            memory[16] <= IMM2 | JMP;
+            memory[17] <= TO;
+            memory[18] <= 8'b00000000;
+            memory[19] <= COUNTER;
+            memory[20] <= POP;
+            memory[21] <= STACK;
+            memory[22] <= TO;
+            memory[23] <= OUTPUT;
+            memory[24] <= IMM2 | JMP;
+            memory[25] <= TO;
+            memory[26] <= 8'b00000000;
+            memory[27] <= COUNTER;
+            memory[28] <= HALT;
+            memory[29] <= NULL;
+            memory[30] <= NULL;
+            memory[31] <= NULL;
+            memory[32] <= 8'b00000000;
+            memory[33] <= 8'b00000000;
+            memory[34] <= 8'b00000000;
+            memory[35] <= 8'b00000000;
+            memory[36] <= 8'b00000000;
+            memory[37] <= 8'b00000000;
+            memory[38] <= 8'b00000000;
+            memory[39] <= 8'b00000000;
+            memory[40] <= 8'b00000000;
+            memory[41] <= 8'b00000000;
+            memory[42] <= 8'b00000000;
+            memory[43] <= 8'b00000000;
+            memory[44] <= 8'b00000000;
+            memory[45] <= 8'b00000000;
+            memory[46] <= 8'b00000000;
+            memory[47] <= 8'b00000000;
+            memory[48] <= 8'b00000000;
+            memory[49] <= 8'b00000000;
+            memory[50] <= 8'b00000000;
+            memory[51] <= 8'b00000000;
+        end 2'b11: begin
+            memory[0]  <= IMM1 | MOV;
+            memory[1]  <= X;
+            memory[2]  <= TO;
+            memory[3]  <= REG0;
+            memory[4]  <= IMM1 | MOV;
+            memory[5]  <= Y;
+            memory[6]  <= TO;
+            memory[7]  <= REG1;
+            memory[8]  <= CALL;
+            memory[9]  <= NULL;
+            memory[10] <= NULL;
+            memory[11] <= 8'b00010000;
+            memory[12] <= IMM2 | JMP;
+            memory[13] <= TO;
+            memory[14] <= 8'b00101100;
+            memory[15] <= COUNTER;
+            // FUNa
+            memory[16] <= ADD;
+            memory[17] <= REG0;
+            memory[18] <= REG1;
+            memory[19] <= REG2;
+            memory[20] <= CALL;
+            memory[21] <= NULL;
+            memory[22] <= NULL;
+            memory[23] <= 8'b00100100;
+            memory[24] <= ADD;
+            memory[25] <= REG0;
+            memory[26] <= REG1;
+            memory[27] <= REG2;
+            memory[28] <= CALL;
+            memory[29] <= NULL;
+            memory[30] <= NULL;
+            memory[31] <= 8'b00100100;
+            memory[32] <= RET;
+            memory[33] <= NULL;
+            memory[34] <= NULL;
+            memory[35] <= NULL;
+            memory[36] <= ADD;
+            memory[37] <= REG2;
+            memory[38] <= REG2;
+            memory[39] <= REG2;
+            memory[40] <= RET;
+            memory[41] <= NULL;
+            memory[42] <= NULL;
+            memory[43] <= NULL;
+            memory[44] <= MOV;
+            memory[45] <= REG2;
+            memory[46] <= TO;
+            memory[47] <= OUTPUT;
+            memory[48] <= HALT;
+            memory[49] <= NULL;
+            memory[50] <= NULL;
+            memory[51] <= NULL;
+        end
+        endcase
         memory[52] <= 8'b00000000;
         memory[53] <= 8'b00000000;
         memory[54] <= 8'b00000000;
@@ -334,8 +481,8 @@ always @(posedge clk or posedge rst) begin
         memory[255] <= 8'b00000000;
         opcode <= 32'b0;
     end else if (edit & send)  begin
-        memory[unit]  <= code;
-    end else begin
+        memory[unit] <= code;
+    end else if (~edit) begin
         opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
     end
 end

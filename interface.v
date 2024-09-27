@@ -1,15 +1,16 @@
 `timescale 1ns / 1ps
 module interface (
-    input wire clk,         // 时钟信号
-    input wire rstROM,      // ROM复位信号
-    input wire rst,         // 复位信号
-    input wire next,        // 下一条指令
-    input wire run,         // 运行
-    input wire speedRun,    // 快速运行
-    input wire edit,        // 编程模式信号
-    input wire [7:0] unit,  // 代码位置
-    input wire [7:0] code,  // 代码
-    input wire send,        // 发送程序信号
+    input wire clk,           // 时钟信号
+    input wire rstROM,        // ROM复位信号
+    input wire rst,           // 复位信号
+    input wire next,          // 下一条指令
+    input wire run,           // 运行
+    input wire speedRun,      // 快速运行
+    input wire edit,          // 编程模式信号
+    input wire [7:0] unit,    // 代码位置
+    input wire [7:0] code,    // 代码
+    input wire send,          // 发送程序信号
+    input wire [1:0] program, // 示例程序
 
     input wire [7:0] I,  // I
     output wire IEnable, // I使能信号

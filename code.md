@@ -222,7 +222,7 @@ label funB
 add         reg2    reg2    reg2       # reg2 <- reg2 + reg2
 ret         null    null    null       # 返回
 label end
-imm2|add    reg2    0       output     # output <- reg2
+mov         reg2    to      output     # output <- reg2
 halt        null    null    null       # 停机
 ```
 函数使用案例，def f(x, y): return 2*(x+y)

@@ -11,6 +11,7 @@ reg edit;
 reg [7:0] unit;
 reg [7:0] code;
 reg send;
+reg [1:0] program;
 reg [7:0] I;
 wire [7:0] O;
 wire IEnable;
@@ -34,6 +35,7 @@ CPU uut (
     .unit(unit),
     .code(code),
     .send(send),
+    .program(program),
     .I(I),
     .O(O),
     .IEnable(IEnable),
@@ -48,14 +50,14 @@ CPU uut (
     .O_monitor_signal(O_monitor_signal)
 );
 always begin
-    #1; clk = ~clk;
+    #5; clk = ~clk;
 end
 initial begin
     $dumpfile("a.vcd");
     $dumpvars(0, CPU_tb);
     clk = 0;
     rst = 0;
-    rstROM = 1;
+    rstROM = 0;
     NEXT = 0;
     RUN = 0;
     SPEEDRUN = 0;
@@ -63,24 +65,30 @@ initial begin
     unit = 8'b00000000;
     code = 8'b00000000;
     send = 0;
+    program = 2'b00;
     I = 8'b00000000;
-    #5; rst = 1; #5; rst =0; #5;
+    #10;
+    rst = 1;
+    rstROM = 1;
+    #10;
+    rst = 0;
     rstROM = 0;
-    // Edit
-    edit = 1;
-    unit = 8'd1;
-    code = 8'b00010000;
-    send = 1; #10 send = 0; #5;
-    unit = 8'd2;
-    code = 8'b00110000;
-    send = 1; #10 send = 0; #5;
-    edit = 0;
-    // Run
-    RUN = 1;
-    #100;
-    #5; rst = 1; rstROM = 1; #5; rst =0; rstROM = 1; #5; rst =0;
-    #5; NEXT = 1; #5; NEXT = 0; #5;
-    #50; SPEEDRUN = 1; #5 SPEEDRUN = 0;
-    #50; $finish;
+    #1; NEXT = 1; #1; NEXT = 0;
+    // // Edit
+    // edit = 1;
+    // unit = 8'd1;
+    // code = 8'b00010000;
+    // send = 1; #10 send = 0; #5;
+    // unit = 8'd2;
+    // code = 8'b00110000;
+    // send = 1; #10 send = 0; #5;
+    // edit = 0;
+    // // Run
+    // RUN = 1;
+    // #100;
+    // #5; rst = 1; rstROM = 1; #5; rst =0; rstROM = 1; #5; rst =0;
+    // #5; NEXT = 1; #5; NEXT = 0; #5;
+    // #50; SPEEDRUN = 1; #5 SPEEDRUN = 0;
+    #100; $finish;
 end
 endmodule

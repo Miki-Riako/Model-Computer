@@ -1,18 +1,19 @@
 module CPU (
-    input wire clk,          // 时钟信号
-    input wire rstROM,       // ROM复位信号
-    input wire rst,          // 复位信号
-    input wire NEXT,         // 下一条指令
-    input wire RUN,          // 运行
-    input wire SPEEDRUN,     // 快速运行
-    input wire edit,         // 编程模式信号
-    input wire [7:0] unit,   // 代码位置
-    input wire [7:0] code,   // 代码
-    input wire send,         // 发送程序信号
-    input wire [7:0] I,      // I
-    output reg [7:0] O,      // O
-    output reg IEnable,      // I使能信号
-    output reg OEnable,      // O使能信号
+    input wire clk,           // 时钟信号
+    input wire rstROM,        // ROM复位信号
+    input wire rst,           // 复位信号
+    input wire NEXT,          // 下一条指令
+    input wire RUN,           // 运行
+    input wire SPEEDRUN,      // 快速运行
+    input wire edit,          // 编程模式信号
+    input wire [7:0] unit,    // 代码位置
+    input wire [7:0] code,    // 代码
+    input wire send,          // 发送程序信号
+    input wire [1:0] program, // 示例程序
+    input wire [7:0] I,       // I
+    output reg [7:0] O,       // O
+    output reg IEnable,       // I使能信号
+    output reg OEnable,       // O使能信号
 
     output wire [7:0] reg0_monitor_signal,    // 监视输出REG0
     output wire [7:0] reg1_monitor_signal,    // 监视输出REG1
@@ -209,6 +210,7 @@ ROM rom (
     .unit(unit),
     .code(code),
     .send(send),
+    .program(program),
     .clk(clk),
     .rst(rstROM),
     .address(cntOutput),
