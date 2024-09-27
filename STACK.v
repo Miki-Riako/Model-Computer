@@ -12,12 +12,13 @@ wire [7:0] out;  // 从 RAM 读取的数据
 
 always @(posedge clk or posedge rst) begin
     if (rst) begin
-        sp <= 8'b00000000;
+        sp     <= 8'b00000000;
         OUTPUT <= 8'b00000000;
+        addr   <= 8'b00000000;
     end else begin
         if (PUSH & ~POP) begin
             addr   <= sp;          // 将堆栈指针作为地址
-            OUTPUT <= 8'bzzzzzzzz; // 三态输出
+            OUTPUT <= 8'bzzzzzzzz;
             sp     <= sp + 1;      // 增加堆栈指针
         end else if (~PUSH & POP) begin
             if (sp > 0) begin

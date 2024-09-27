@@ -6,8 +6,8 @@ module CPU (
     input wire RUN,          // 运行
     input wire SPEEDRUN,     // 快速运行
     input wire edit,         // 编程模式信号
-    input wire [7:0] line,   // 代码行数
-    input wire [31:0] code,  // 代码
+    input wire [7:0] unit,   // 代码位置
+    input wire [7:0] code,   // 代码
     input wire send,         // 发送程序信号
     input wire [7:0] I,      // I
     output reg [7:0] O,      // O
@@ -112,6 +112,7 @@ registerPlus reg0 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg0_monitor_signal)
 );
 registerPlus reg1 (
@@ -123,6 +124,7 @@ registerPlus reg1 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg1_monitor_signal)
 );
 registerPlus reg2 (
@@ -134,6 +136,7 @@ registerPlus reg2 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg2_monitor_signal)
 );
 registerPlus reg3 (
@@ -145,6 +148,7 @@ registerPlus reg3 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg3_monitor_signal)
 );
 registerPlus reg4 (
@@ -156,6 +160,7 @@ registerPlus reg4 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg4_monitor_signal)
 );
 registerPlus reg5 (
@@ -167,6 +172,7 @@ registerPlus reg5 (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
+    .constant_output(),
     .monitor_signal(reg5_monitor_signal)
 );
 STACK stack(
@@ -186,7 +192,8 @@ registerPlus reg_ram (
     .save_byte(ADDRBUS),
     .tri1_output(ARGBUS[7:0]),
     .tri2_output(ARGBUS[15:8]),
-    .constant_output(ramAddr)
+    .constant_output(ramAddr),
+    .monitor_signal()
 );
 RAM ram(
     .clk(clk),
@@ -199,7 +206,7 @@ RAM ram(
 );
 ROM rom (
     .edit(edit),
-    .line(line),
+    .unit(unit),
     .code(code),
     .send(send),
     .clk(clk),

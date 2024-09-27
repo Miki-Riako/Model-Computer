@@ -1,7 +1,7 @@
 module ROM (
     input wire edit,          // 编程模式信号
-    input wire [7:0] line,    // 代码行数
-    input wire [31:0] code,   // 代码
+    input wire [7:0] unit,    // 代码位置
+    input wire [7:0] code,    // 代码
     input wire send,          // 发送程序信号
     input wire clk,           // 时钟信号
     input wire rst,           // 复位信号
@@ -74,7 +74,7 @@ LABEL END
 localparam IO_NUM = 8'b00100000; // 每次读32个
 always @(posedge clk or posedge rst) begin
     if (rst) begin // 这是ROM (BIOS)
-        memory[0]  <= IMM1 | MOV;               // 0: IMM1 | MOV
+        memory[0]  <= (IMM1 | MOV);               // 0: IMM1 | MOV
         memory[1]  <= 8'b00000000;              // 1: 0
         memory[2]  <= TO;                       // 2: TO
         memory[3]  <= REG_RAM;                  // 3: REG_RAM
@@ -119,11 +119,8 @@ always @(posedge clk or posedge rst) begin
         memory[40] <= HALT;                     // 40: HALT
         
         opcode <= 32'b0;
-    end else if (send)  begin
-        memory[4*line]   <= code[7:0];
-        memory[4*line+1] <= code[15:8];
-        memory[4*line+2] <= code[23:16];
-        memory[4*line+3] <= code[31:24];
+    end else if (edit & send)  begin
+        memory[unit]  <= code;
     end else begin
         opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
     end
