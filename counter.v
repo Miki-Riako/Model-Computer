@@ -22,33 +22,25 @@ always @(posedge clk or posedge rst or posedge NEXT or posedge RUN or posedge SP
         div_counter <= 26'd0;
         running <= 1'b0;
     end else if (NEXT) begin
-        if (mode) begin
-            count <= value;
-            monitor_signal <= value;
-        end else begin
-            count <= count + STEP;
-            monitor_signal <= monitor_signal + STEP;
-        end
+        count          <= mode ? value : (count + STEP);
+        monitor_signal <= mode ? value : (monitor_signal + STEP);
     end else if (RUN | SPEEDRUN) begin
         running <= 1'b1;
-    end else begin
-        if (ENABLE) begin
-            running <= 1'b0;
-        end
-        if (mode) begin
-            count <= value;
-            monitor_signal <= value;
-        end else if (running) begin
-            // Divider to 50,000,000 times or less, 1s or 0.01s perline
-            if (div_counter == (SPEEDRUN ? 26'd499999 : 26'd49999999)) begin
-                div_counter <= 26'd0;
-                if (~mode) begin
-                    count <= count + STEP;
-                    monitor_signal <= monitor_signal + STEP;
-                end
-            end else begin
-                div_counter <= div_counter + 1;
+    end else if (ENABLE) begin
+        running <= 1'b0;
+    end else if (mode) begin
+        count <= value;
+        monitor_signal <= value;
+    end else if (running) begin
+        // Divider to 50,000,000 times or less, 1s or 0.01s perline
+        if (div_counter == (SPEEDRUN ? 26'd499999 : 26'd49999999)) begin
+            div_counter <= 26'd0;
+            if (~mode) begin
+                count <= count + STEP;
+                monitor_signal <= monitor_signal + STEP;
             end
+        end else begin
+            div_counter <= div_counter + 1;
         end
     end
 end
