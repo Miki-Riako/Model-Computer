@@ -15,6 +15,7 @@ module CPU (
     output reg IEnable,       // I使能信号
     output reg OEnable,       // O使能信号
 
+    // input wire [7:0]  cntOutput_debug,
     output wire [7:0] reg0_monitor_signal,    // 监视输出REG0
     output wire [7:0] reg1_monitor_signal,    // 监视输出REG1
     output wire [7:0] reg2_monitor_signal,    // 监视输出REG2
@@ -33,6 +34,7 @@ ARGBUS1: ARGBUS[7:0]  -> 参数码参数1
 ARGBUS2: ARGBUS[15:8] -> 参数码参数2
 ADDRBUS               -> 地址码
 **/
+wire clk_out;
 wire [31:0] OPBUS;
 wire [15:0] ARGBUS;
 wire [7:0]  ADDRBUS;
@@ -43,12 +45,15 @@ wire [7:0] ramAddr, ramOutput;                     // RAM读写
 wire [7:0] stackInput, stackOutput;                // 栈读写
 wire conditionOutput;                              // 条件判断信号
 
-assign isCall = (OPBUS[7:0] == 8'b0011000);
-assign isRet  = (OPBUS[7:0] == 8'b0011001);
-assign isHalt = (OPBUS[7:0] == 8'b0011010);
+// // For debug
+// assign cntOutput = cntOutput_debug;
+
+assign isCall = (OPBUS[7:0] == 8'b00110000);
+assign isRet  = (OPBUS[7:0] == 8'b00110001);
+assign isHalt = (OPBUS[7:0] == 8'b00110010);
 assign stackInput = isCall ? cntOutput + 8'b00000100 : ADDRBUS;
 
-always @(posedge clk or posedge rst) begin
+always @(posedge clk_out or posedge rst) begin
     if (rst) begin
         O <= 8'b00000000;
         IEnable <= 0;
@@ -105,7 +110,7 @@ ALU alu (
     .OUTPUT(ADDRBUS)
 );
 registerPlus reg0 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[0]),
     .load2_enable(dOPBUS3[0]),
@@ -117,7 +122,7 @@ registerPlus reg0 (
     .monitor_signal(reg0_monitor_signal)
 );
 registerPlus reg1 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[1]),
     .load2_enable(dOPBUS3[1]),
@@ -129,7 +134,7 @@ registerPlus reg1 (
     .monitor_signal(reg1_monitor_signal)
 );
 registerPlus reg2 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[2]),
     .load2_enable(dOPBUS3[2]),
@@ -141,7 +146,7 @@ registerPlus reg2 (
     .monitor_signal(reg2_monitor_signal)
 );
 registerPlus reg3 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[3]),
     .load2_enable(dOPBUS3[3]),
@@ -153,7 +158,7 @@ registerPlus reg3 (
     .monitor_signal(reg3_monitor_signal)
 );
 registerPlus reg4 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[4]),
     .load2_enable(dOPBUS3[4]),
@@ -165,7 +170,7 @@ registerPlus reg4 (
     .monitor_signal(reg4_monitor_signal)
 );
 registerPlus reg5 (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[5]),
     .load2_enable(dOPBUS3[5]),
@@ -177,7 +182,7 @@ registerPlus reg5 (
     .monitor_signal(reg5_monitor_signal)
 );
 STACK stack(
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .POP(dOPBUS2[10] | dOPBUS3[10] | isRet),
     .PUSH(dOPBUS4[10] | isCall),
@@ -185,7 +190,7 @@ STACK stack(
     .OUTPUT(stackOutput)
 );
 registerPlus reg_ram (
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .load1_enable(dOPBUS2[9]),
     .load2_enable(dOPBUS3[9]),
@@ -197,7 +202,7 @@ registerPlus reg_ram (
     .monitor_signal()
 );
 RAM ram(
-    .clk(clk),
+    .clk(clk_out),
     .rst(rst),
     .read(dOPBUS2[8] | dOPBUS3[8]),
     .write(dOPBUS4[8]),
@@ -211,7 +216,7 @@ ROM rom (
     .code(code),
     .send(send),
     .program(program),
-    .clk(clk),
+    .clk(clk_out),
     .rst(rstROM),
     .address(cntOutput),
     .opcode(OPBUS)
@@ -226,6 +231,7 @@ counter count (
     .SPEEDRUN(SPEEDRUN),
     .mode(conditionOutput | isCall | isRet | dOPBUS4[6]),
     .value(cntInput),
+    .clk_out(clk_out),
     .count(cntOutput),
     .monitor_signal(counter_monitor_signal)
     );
