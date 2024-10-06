@@ -26,6 +26,16 @@ wire [7:0] counter_monitor_signal;
 wire [7:0] O_monitor_signal;
 
 localparam ADD = 8'b00000000;
+localparam SUB = 8'b00000001;
+localparam AND = 8'b00000010;
+localparam OR  = 8'b00000011;
+localparam NOT = 8'b00000100;
+localparam XOR = 8'b00000101;
+localparam SHL = 8'b00000110;
+localparam SHR = 8'b00000111;
+localparam MUL = 8'b00001000;
+localparam DIV = 8'b00001001;
+localparam MOD = 8'b00001010;
 localparam NULL    = 8'b00000000;
 localparam REG0    = 8'b00000000;
 localparam REG1    = 8'b00000001;
@@ -67,7 +77,7 @@ always begin
     #1; clk = ~clk;
 end
 initial begin
-    $dumpfile("1.vcd");
+    $dumpfile("2.vcd");
     $dumpvars(0, CPU_tb);
     clk = 0;
     rst = 0;
@@ -89,27 +99,27 @@ initial begin
     #2; code = INPUT; unit = 8'd2; #2; send = 1; #2; send = 0;
     #2; code = REG0; unit = 8'd3; #2; send = 1; #2; send = 0;
 
-    #2; code = ADD; unit = 8'd4; #2; send = 1; #2; send = 0;
+    #2; code = SUB; unit = 8'd4; #2; send = 1; #2; send = 0;
     #2; code = REG0; unit = 8'd5; #2; send = 1; #2; send = 0;
     #2; code = INPUT; unit = 8'd6; #2; send = 1; #2; send = 0;
     #2; code = REG1; unit = 8'd7; #2; send = 1; #2; send = 0;
 
-    #2; code = ADD; unit = 8'd8; #2; send = 1; #2; send = 0;
+    #2; code = AND; unit = 8'd8; #2; send = 1; #2; send = 0;
     #2; code = REG0; unit = 8'd9; #2; send = 1; #2; send = 0;
     #2; code = REG1; unit = 8'd10; #2; send = 1; #2; send = 0;
     #2; code = REG2; unit = 8'd11; #2; send = 1; #2; send = 0;
 
-    #2; code = ADD; unit = 8'd12; #2; send = 1; #2; send = 0;
+    #2; code = OR; unit = 8'd12; #2; send = 1; #2; send = 0;
     #2; code = REG1; unit = 8'd13; #2; send = 1; #2; send = 0;
     #2; code = REG2; unit = 8'd14; #2; send = 1; #2; send = 0;
     #2; code = REG3; unit = 8'd15; #2; send = 1; #2; send = 0;
 
-    #2; code = ADD; unit = 8'd16; #2; send = 1; #2; send = 0;
+    #2; code = NOT; unit = 8'd16; #2; send = 1; #2; send = 0;
     #2; code = REG2; unit = 8'd17; #2; send = 1; #2; send = 0;
-    #2; code = REG3; unit = 8'd18; #2; send = 1; #2; send = 0;
+    #2; code = NULL; unit = 8'd18; #2; send = 1; #2; send = 0;
     #2; code = REG4; unit = 8'd19; #2; send = 1; #2; send = 0;
     
-    #2; code = ADD; unit = 8'd20; #2; send = 1; #2; send = 0;
+    #2; code = XOR; unit = 8'd20; #2; send = 1; #2; send = 0;
     #2; code = REG3; unit = 8'd21; #2; send = 1; #2; send = 0;
     #2; code = REG4; unit = 8'd22; #2; send = 1; #2; send = 0;
     #2; code = REG5; unit = 8'd23; #2; send = 1; #2; send = 0;
