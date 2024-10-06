@@ -7,7 +7,7 @@ module ROM (
     input wire clk,           // 时钟信号
     input wire rst,           // 复位信号
     input wire [7:0] address, // 地址输入
-    output reg [31:0] opcode  // 当前输出的机器码
+    output wire [31:0] opcode  // 当前输出的机器码
 );
 
 localparam IMM1 = 8'b10000000;
@@ -52,11 +52,11 @@ localparam RET  = 8'b00110001;
 localparam HALT = 8'b00110010;
 
 reg [7:0] memory [0:255];     // 16*16 = 256个8位机器码
+assign opcode = edit ? 32'h0000 : {memory[address+3], memory[address+2], memory[address+1], memory[address]};
 
 localparam IO_NUM = 8'b00100000;
 localparam X = 8'b00100011;
 localparam Y = 8'b00110111;
-
 always @(posedge clk or posedge rst) begin
     if (rst) begin // 这是ROM (BIOS)
         case (program[1:0])
@@ -479,11 +479,8 @@ always @(posedge clk or posedge rst) begin
         memory[253] <= 8'b00000000;
         memory[254] <= 8'b00000000;
         memory[255] <= 8'b00000000;
-        opcode <= 32'b0;
     end else if (edit & send)  begin
         memory[unit] <= code;
-    end else if (~edit) begin
-        opcode <= {memory[address+3], memory[address+2], memory[address+1], memory[address]};
     end
 end
 endmodule

@@ -15,7 +15,6 @@ module CPU (
     output reg IEnable,       // I使能信号
     output reg OEnable,       // O使能信号
 
-    // input wire [7:0]  cntOutput_debug,
     output wire [7:0] reg0_monitor_signal,    // 监视输出REG0
     output wire [7:0] reg1_monitor_signal,    // 监视输出REG1
     output wire [7:0] reg2_monitor_signal,    // 监视输出REG2
@@ -44,9 +43,6 @@ wire [7:0] cntInput, cntOutput;                    // 计数指令数
 wire [7:0] ramAddr, ramOutput;                     // RAM读写
 wire [7:0] stackInput, stackOutput;                // 栈读写
 wire conditionOutput;                              // 条件判断信号
-
-// // For debug
-// assign cntOutput = cntOutput_debug;
 
 assign isCall = (OPBUS[7:0] == 8'b00110000);
 assign isRet  = (OPBUS[7:0] == 8'b00110001);
@@ -234,7 +230,7 @@ counter count (
     .clk_out(clk_out),
     .count(cntOutput),
     .monitor_signal(counter_monitor_signal)
-    );
+);
 decoder d2_1(
     .enable(imm1 | OPBUS[12]),
     .A(OPBUS[15:8]),

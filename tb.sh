@@ -15,6 +15,19 @@ compf() {
 }
 
 CPU="ROM.v RAM.v STACK.v DEC.v ALU.v COND.v decoder.v registerPlus.v counter.v controller.v CPU.v"
+checkP() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog $CPU "checkpoint$1.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+
 compCPU() {
     # 编译verilog代码
     echo "compiling verilog design and testbench..."

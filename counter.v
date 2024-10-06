@@ -16,7 +16,7 @@ module counter (
 reg [25:0] div_counter;
 reg speed;
 reg running;
-// always @(posedge clk or negedge rst) begin
+// always @(posedge clk or posedge rst) begin
 //     if (rst) begin
 //         div_counter <= 26'd0;
 //         clk_out <= 1'b0;

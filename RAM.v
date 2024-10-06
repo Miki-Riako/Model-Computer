@@ -5,9 +5,12 @@ module RAM (
     input wire write,                   // 写信号
     input wire [7:0] address,           // 地址输入
     input wire [7:0] data,              // 数据输入
-    output reg [7:0] out                // 数据输出
+    output wire [7:0] out                // 数据输出
+    // output reg [7:0] out                // 数据输出
 );
 reg [7:0] memory [0:255];               // 16*16 = 256个8位机器码
+
+assign out = read ? memory[address] : 8'bzzzzzzzz;
 
 always @(posedge clk or posedge rst) begin
     if (rst) begin
@@ -267,12 +270,12 @@ always @(posedge clk or posedge rst) begin
         memory[253] <= 8'b00000000;
         memory[254] <= 8'b00000000;
         memory[255] <= 8'b00000000;
-        out <= 8'bzzzzzzzz;
+        // out <= 8'bzzzzzzzz;
     end else begin
         if (write) begin
             memory[address] <= data;
         end
-        out <= read ? memory[address] : 8'bzzzzzzzz;
+        // out <= read ? memory[address] : 8'bzzzzzzzz;
     end
 end
 endmodule
