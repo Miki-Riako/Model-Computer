@@ -55,6 +55,13 @@ reg [7:0] memory [0:255];     // 16*16 = 256个8位机器码
 assign opcode = edit ? 32'h0000 : {memory[address+3], memory[address+2], memory[address+1], memory[address]};
 
 localparam IO_NUM = 8'b00100000;
+localparam CIRCLE_I = 8'd4;
+localparam DATA_O = 8'd20;
+localparam CIRCLE_O = 8'd24;
+localparam THE_END = 8'd40;
+localparam READ_IN = 8'd0;
+localparam PUSH_DATA = 8'd12;
+localparam POP_DATA = 8'd20;
 localparam X = 8'b00100011;
 localparam Y = 8'b00110111;
 always @(posedge clk or posedge rst) begin
@@ -115,45 +122,49 @@ always @(posedge clk or posedge rst) begin
             memory[51] <= 8'b00000000;
         end 2'b01: begin
             memory[0]  <= (IMM1 | MOV);
-            memory[1]  <= 8'b00000000;
+            memory[1]  <= 8'd0;
             memory[2]  <= TO;
             memory[3]  <= REG_RAM;
+            // CIRCLE_I
             memory[4]  <= IMM2 | IF_EQUAL;
             memory[5]  <= REG_RAM;
             memory[6]  <= IO_NUM;
-            memory[7]  <= 8'b00010100;
+            memory[7]  <= DATA_O;
             memory[8]  <= MOV;
             memory[9]  <= INPUT;
             memory[10] <= TO;
             memory[11] <= RAM;
             memory[12] <= IMM2 | ADD;
             memory[13] <= REG_RAM;
-            memory[14] <= 8'b00000001;
+            memory[14] <= 8'd1;
             memory[15] <= REG_RAM;
             memory[16] <= IMM2 | JMP;
             memory[17] <= TO;
-            memory[18] <= 8'b00000100;
+            memory[18] <= CIRCLE_I;
             memory[19] <= COUNTER;
+            // DATA_O
             memory[20] <= IMM1 | MOV;
-            memory[21] <= 8'b00000000;
+            memory[21] <= 8'd0;
             memory[22] <= TO;
             memory[23] <= REG_RAM;
+            // CIRCEL_O
             memory[24] <= IMM2 | IF_EQUAL;
             memory[25] <= REG_RAM;
             memory[26] <= IO_NUM;
-            memory[27] <= 8'b00101000;
+            memory[27] <= THE_END;
             memory[28] <= MOV;
             memory[29] <= RAM;
             memory[30] <= TO;
             memory[31] <= OUTPUT;
             memory[32] <= IMM2 | ADD;
             memory[33] <= REG_RAM;
-            memory[34] <= 8'b00000001;
+            memory[34] <= 8'd1;
             memory[35] <= REG_RAM;
             memory[36] <= IMM1 | MOV;
-            memory[37] <= 8'b00000100;
+            memory[37] <= CIRCLE_O;
             memory[38] <= TO;
             memory[39] <= COUNTER;
+            // THE_END
             memory[40] <= HALT;
             memory[41] <= NULL;
             memory[42] <= NULL;
@@ -167,33 +178,36 @@ always @(posedge clk or posedge rst) begin
             memory[50] <= 8'b00000000;
             memory[51] <= 8'b00000000;
         end 2'b10: begin
+            // READ_IN
             memory[0]  <= MOV;
             memory[1]  <= INPUT;
             memory[2]  <= TO;
             memory[3]  <= REG3;
             memory[4]  <= IMM2 | IF_EQUAL;
             memory[5]  <= REG3;
-            memory[6]  <= 8'b00000000;
-            memory[7]  <= 8'b0010100;
+            memory[6]  <= 8'd0;
+            memory[7]  <= POP_DATA;
             memory[8]  <= IMM2 | IF_NOT_EQUAL;
             memory[9]  <= REG3;
-            memory[10] <= 8'b00000000;
-            memory[11] <= 8'b00001100;
+            memory[10] <= 8'd0;
+            memory[11] <= PUSH_DATA;
+            // PUSH_DATA
             memory[12] <= PUSH;
             memory[13] <= REG3;
             memory[14] <= TO;
             memory[15] <= STACK;
             memory[16] <= IMM2 | JMP;
             memory[17] <= TO;
-            memory[18] <= 8'b00000000;
+            memory[18] <= READ_IN;
             memory[19] <= COUNTER;
+            // POP_DATA
             memory[20] <= POP;
             memory[21] <= STACK;
             memory[22] <= TO;
             memory[23] <= OUTPUT;
             memory[24] <= IMM2 | JMP;
             memory[25] <= TO;
-            memory[26] <= 8'b00000000;
+            memory[26] <= READ_IN;
             memory[27] <= COUNTER;
             memory[28] <= HALT;
             memory[29] <= NULL;
