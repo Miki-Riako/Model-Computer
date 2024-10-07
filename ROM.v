@@ -54,7 +54,7 @@ localparam HALT = 8'b00110010;
 reg [7:0] memory [0:255];     // 16*16 = 256个8位机器码
 assign opcode = edit ? 32'h0000 : {memory[address+3], memory[address+2], memory[address+1], memory[address]};
 
-localparam IO_NUM = 8'b00100000;
+localparam IO_NUM = 8'd32;
 localparam CIRCLE_I = 8'd4;
 localparam DATA_O = 8'd20;
 localparam CIRCLE_O = 8'd24;
@@ -62,8 +62,11 @@ localparam THE_END = 8'd40;
 localparam READ_IN = 8'd0;
 localparam PUSH_DATA = 8'd12;
 localparam POP_DATA = 8'd20;
-localparam X = 8'b00100011;
-localparam Y = 8'b00110111;
+localparam X = 8'd35;
+localparam Y = 8'd55;
+localparam FUNA = 8'd16;
+localparam FUNB = 8'd28;
+localparam NEW_END = 8'd36;
 always @(posedge clk or posedge rst) begin
     if (rst) begin // 这是ROM (BIOS)
         case (program[1:0])
@@ -169,14 +172,6 @@ always @(posedge clk or posedge rst) begin
             memory[41] <= NULL;
             memory[42] <= NULL;
             memory[43] <= NULL;
-            memory[44] <= 8'b00000000;
-            memory[45] <= 8'b00000000;
-            memory[46] <= 8'b00000000;
-            memory[47] <= 8'b00000000;
-            memory[48] <= 8'b00000000;
-            memory[49] <= 8'b00000000;
-            memory[50] <= 8'b00000000;
-            memory[51] <= 8'b00000000;
         end 2'b10: begin
             // READ_IN
             memory[0]  <= MOV;
@@ -225,14 +220,6 @@ always @(posedge clk or posedge rst) begin
             memory[41] <= 8'b00000000;
             memory[42] <= 8'b00000000;
             memory[43] <= 8'b00000000;
-            memory[44] <= 8'b00000000;
-            memory[45] <= 8'b00000000;
-            memory[46] <= 8'b00000000;
-            memory[47] <= 8'b00000000;
-            memory[48] <= 8'b00000000;
-            memory[49] <= 8'b00000000;
-            memory[50] <= 8'b00000000;
-            memory[51] <= 8'b00000000;
         end 2'b11: begin
             memory[0]  <= IMM1 | MOV;
             memory[1]  <= X;
@@ -245,12 +232,12 @@ always @(posedge clk or posedge rst) begin
             memory[8]  <= CALL;
             memory[9]  <= NULL;
             memory[10] <= NULL;
-            memory[11] <= 8'b00010000;
+            memory[11] <= FUNA;
             memory[12] <= IMM2 | JMP;
             memory[13] <= TO;
-            memory[14] <= 8'b00101100;
+            memory[14] <= NEW_END;
             memory[15] <= COUNTER;
-            // FUNa
+            // FUNA
             memory[16] <= ADD;
             memory[17] <= REG0;
             memory[18] <= REG1;
@@ -258,37 +245,39 @@ always @(posedge clk or posedge rst) begin
             memory[20] <= CALL;
             memory[21] <= NULL;
             memory[22] <= NULL;
-            memory[23] <= 8'b00100100;
-            memory[24] <= ADD;
-            memory[25] <= REG0;
-            memory[26] <= REG1;
-            memory[27] <= REG2;
-            memory[28] <= CALL;
-            memory[29] <= NULL;
-            memory[30] <= NULL;
-            memory[31] <= 8'b00100100;
+            memory[23] <= FUNB;
+            memory[24] <= RET;
+            memory[25] <= NULL;
+            memory[26] <= NULL;
+            memory[27] <= NULL;
+            // FUNB
+            memory[28] <= ADD;
+            memory[29] <= REG2;
+            memory[30] <= REG2;
+            memory[31] <= REG2;
             memory[32] <= RET;
             memory[33] <= NULL;
             memory[34] <= NULL;
             memory[35] <= NULL;
-            memory[36] <= ADD;
+            // NEW_END
+            memory[36] <= MOV;
             memory[37] <= REG2;
-            memory[38] <= REG2;
-            memory[39] <= REG2;
-            memory[40] <= RET;
+            memory[38] <= TO;
+            memory[39] <= OUTPUT;
+            memory[40] <= HALT;
             memory[41] <= NULL;
             memory[42] <= NULL;
             memory[43] <= NULL;
-            memory[44] <= MOV;
-            memory[45] <= REG2;
-            memory[46] <= TO;
-            memory[47] <= OUTPUT;
-            memory[48] <= HALT;
-            memory[49] <= NULL;
-            memory[50] <= NULL;
-            memory[51] <= NULL;
         end
         endcase
+        memory[44] <= 8'b00000000;
+        memory[45] <= 8'b00000000;
+        memory[46] <= 8'b00000000;
+        memory[47] <= 8'b00000000;
+        memory[48] <= 8'b00000000;
+        memory[49] <= 8'b00000000;
+        memory[50] <= 8'b00000000;
+        memory[51] <= 8'b00000000;
         memory[52] <= 8'b00000000;
         memory[53] <= 8'b00000000;
         memory[54] <= 8'b00000000;
