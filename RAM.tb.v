@@ -21,7 +21,7 @@ always begin
     #1 clk = ~clk;
 end
 initial begin
-    $dumpfile("a.vcd");
+    $dumpfile("ram_tb.vcd");
     $dumpvars(0, RAM_tb);
     clk   = 0;
     rst   = 0;

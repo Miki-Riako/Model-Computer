@@ -64,6 +64,68 @@ compc() {
     fi
 }
 
+compr() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "registerPlus.v" "registerPlus.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+
+compdec() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "DEC.v" "DEC.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+compalu() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "ALU.v" "ALU.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+compcond() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "COND.v" "COND.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+compcu() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "controller.v" "controller.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+
 comprom() {
     # 编译verilog代码
     echo "compiling verilog design and testbench..."
@@ -80,6 +142,18 @@ compram() {
     # 编译verilog代码
     echo "compiling verilog design and testbench..."
     iverilog "RAM.v" "RAM.tb.v"
+    if [ $? -ne 0 ]; then
+        echo "compilation failed."
+    else
+        echo "running simulation..."
+        ./a.out
+    fi
+}
+
+compstack() {
+    # 编译verilog代码
+    echo "compiling verilog design and testbench..."
+    iverilog "RAM.v" "STACK.v" "STACK.tb.v"
     if [ $? -ne 0 ]; then
         echo "compilation failed."
     else

@@ -131,9 +131,9 @@ NOT will ignore the second argument.
 | if_equal                | 00100000    |
 | if_not_equal            | 00100001    |
 | if_less                 | 00100010    |
-| if_less_or__equal       | 00100011    |
+| if_less_or_equal        | 00100011    |
 | if_greater              | 00100100    |
-| if_greater_or__equal    | 00100101    |
+| if_greater_or_equal     | 00100101    |
 | call                    | 00110000    |
 | ret                     | 00110001    |
 | halt                    | 00110010    |
@@ -160,7 +160,7 @@ if_less reg0 re1 16
 ```
 如果reg0 < reg1，跳转到16
 ``` asm
-imm2|if_equal reg_ram 32 | 0
+imm2|if_equal reg_ram 32 0
 ```
 如果reg_ram == 32，跳转到0
 

@@ -24,7 +24,7 @@ initial begin
     forever #1 clk = ~clk;
 end
 initial begin
-    $dumpfile("a.vcd");
+    $dumpfile("rom_tb.vcd");
     $dumpvars(0, ROM_tb);
     edit = 0;
     unit = 0;
