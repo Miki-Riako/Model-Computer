@@ -3,3 +3,6 @@
 *.tb.v
 *.out
 *.vcd
+*.xci
+minicpu_env/soc_verify/rtl/xilinx_ip/
+minicpu_env/soc_verify/run_vivado/project/
