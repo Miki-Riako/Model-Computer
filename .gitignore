@@ -9,3 +9,4 @@ minicpu_env/soc_verify/run_vivado/project/
 mycpu_env/soc_verify/soc_dram/rtl/xilinx_ip/
 mycpu_env/soc_verify/soc_dram/run_vivado/project/
 mycpu_env_backup
+mycpu_env - 副本

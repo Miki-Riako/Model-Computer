@@ -59,7 +59,7 @@ module inst_ram #(
 			.we(we)
 		);
 		initial begin
-			$readmemb("C:\\Users\\Lenovo\\Model-Computer\\obj\\inst_ram.mif", async_ram.ram);
+			$readmemb("C:\\Users\\Lenovo\\Model-Computer\\mycpu_env\\func\\obj\\inst_ram.mif", async_ram.ram);
 		end
 endmodule
 
@@ -84,5 +84,6 @@ module data_ram #(
 			.we(we)
 		);
 		initial begin
-			$readmemb("C:\\Users\\Lenovo\\Model-Computer\\obj\\data_ram.mif",s
+			$readmemb("C:\\Users\\Lenovo\\Model-Computer\\mycpu_env\\func\\obj\\data_ram.mif", async_ram.ram);
+		end
 endmodule
